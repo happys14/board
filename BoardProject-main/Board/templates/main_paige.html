@@ -1,0 +1,148 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}Объявления{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Боковая панель -->
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <div class="position-sticky">
+                <h4 class="mt-3">Фильтр по категориям</h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'ads_list' %}">Все категории</a>
+                    </li>
+                    {% for category in categories %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="?category={{ category.id }}">{{ category.category }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <hr>
+                <h4>Навигация</h4>
+                <ul class="nav flex-column">
+                     <li class="nav-item">
+                        <a class="btn btn-primary w-100 mb-2 animated-btn" href="{% url 'signup' %}">Регистрация</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary w-100 mb-2 animated-btn" href="{% url 'profile' %}">Личный кабинет</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-success w-100 mb-2 animated-btn" href="{% url 'ads_create' %}">Создать объявление</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-info w-100 mb-2 animated-btn" href="{% url 'news_list' %}">Новости</a>
+                    </li>
+                    <li class="nav-item">
+                         <a class="btn btn-info w-100 mb-2 animated-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeTjx4DKuHyBSx8GSNoHzM-mMo9HKPB0CT1SIs-th3KIBz0WA/formResponse?pli=1" target="_blank">
+                         Связаться с поддержкой
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Основной контент -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-4">
+            <div class="row">
+                {% for ad in ads %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{% url 'ads_detail' ad.id %}">{{ ad.title }}</a>
+                                </h5>
+                                <div class="card-content">{{ ad.preview|safe }}</div>
+                                <p><strong>Автор:</strong>
+                                    <a href="{% url 'user_profile' ad.author.id %}">{{ ad.author.profile.nickname }}</a>
+                                </p>
+                                <p><strong>Дата:</strong> {{ ad.date|date:"d.m.Y H:i" }}</p>
+                                <p><strong>Категории:</strong>
+                                    {% for category in ad.category.all %}
+                                        <a href="?category={{ category.id }}">{{ category.category }}</a>{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <a href="{% url 'ads_detail' ad.id %}" class="btn btn-primary animated-btn">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>Объявлений пока нет.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Пагинация -->
+            {% if is_paginated %}
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link animated-btn" href="?page=1">Первая</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link animated-btn" href="?page={{ page_obj.previous_page_number }}">←</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item disabled">
+                            <span class="page-link">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link animated-btn" href="?page={{ page_obj.next_page_number }}">→</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link animated-btn" href="?page={{ page_obj.paginator.num_pages }}">Последняя</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<!-- Стили -->
+<style>
+    .card-content figure {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto; /* Центрирование */
+}
+.card-content img {
+    max-width: 100%;
+    height: auto;
+    max-height: 500px; /* Ограничение по высоте */
+    object-fit: contain;
+}
+    /* Карточки */
+    .card {
+        height: auto;
+    }
+    .card-body {
+        overflow: visible;
+    }
+
+    /* Анимация кнопок */
+    .animated-btn {
+        transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    }
+    .animated-btn:hover {
+        transform: scale(1.05);
+    }
+
+    /* Специальные эффекты для разных кнопок */
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+    .btn-success:hover {
+        background-color: #218838;
+    }
+    .btn-info:hover {
+        background-color: #117a8b;
+    }
+</style>
+{% endblock %}

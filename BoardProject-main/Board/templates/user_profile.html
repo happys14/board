@@ -1,0 +1,76 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}Профиль{% endblock %}
+
+
+{% block content %}
+<div class="container mt-5">
+    <div class="col-md-8 mx-auto">
+
+        <!-- Карточка профиля -->
+        <div class="card shadow-lg p-4 mb-4 rounded">
+                <img src="{{ profile.avatar.url }}" alt="Аватар" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+
+            <h2 class="text-center mb-3">Профиль пользователя {{ profile.nickname }}</h2>
+            <hr>
+            <div class="mb-3">
+                <p><strong>О себе:</strong>
+                    {% if profile.bio %}
+                        {{ profile.bio }}
+                    {% else %}
+                        <span class="text-muted">Пользователь пока не заполнил информацию о себе.</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Объявления пользователя -->
+        <h3 class="text-center mt-4">Объявления пользователя</h3>
+
+        {% if ads %}
+            {% for ad in ads %}
+                <div class="card mb-3 p-3 shadow-sm">
+                    <h4>
+                        <a href="{% url 'ads_detail' ad.id %}" class="text-decoration-none">
+                            {{ ad.title }}
+                        </a>
+                    </h4>
+
+                    <p class="text-muted">
+                        <strong>Категории:</strong>
+                        {% for category in ad.category.all %}
+                            {{ category.category }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+
+                    <div class="card-content">{{ ad.preview|striptags|safe }}</div>
+                    <p class="text-muted"><strong>Дата публикации:</strong> {{ ad.date|date:"d.m.Y H:i" }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center text-muted">У пользователя пока нет объявлений.</p>
+        {% endif %}
+
+        <!-- Кнопка возврата -->
+        <div class="text-center mt-4">
+            <a href="{% url 'ads_list' %}" class="btn btn-light text-primary animated-btn">← Вернуться к объявлениям</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+<style>
+
+
+    /* Анимация кнопок */
+    .animated-btn {
+        transition: transform 0.2s ease-in-out, background-color 0.3s ease-in-out;
+    }
+    .animated-btn:hover {
+        transform: scale(1.05);
+    }
+    .animated-btn:active {
+        transform: scale(0.95);
+    }
+</style>

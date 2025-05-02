@@ -1,0 +1,164 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}Отклики{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="col-md-8 mx-auto">
+        <h2 class="text-center mb-4">📬 Мои отклики</h2>
+<form method="GET" class="mb-4">
+    <label for="ad_filter" class="form-label">Фильтровать по объявлению:</label>
+    <select name="ad_id" id="ad_filter" class="form-select" onchange="this.form.submit()">
+        <option value="">Все объявления</option>
+        {% for ad in ads %}
+            <option value="{{ ad.id }}" {% if ad.id|stringformat:"s" == request.GET.ad_id %}selected{% endif %}>
+                {{ ad.title }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+        {% if responses %}
+            <div class="list-group">
+                {% for response in responses %}
+    <div class="response-card list-group-item shadow-sm p-4 mb-3">
+        <h5 class="mb-2">{{ response.ad.title }}</h5>
+        <p class="text-muted">{{ response.date_created|date:"d.m.Y H:i" }}</p>
+        <p>{{ response.text }}</p>
+
+        <div class="d-flex justify-content-between">
+            {% if not response.is_accepted %}
+                <!-- Кнопки "Принять" и "Отклонить", если отклик не принят -->
+                <form method="post" action="{% url 'accept_response' response.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success animated-btn">✔ Принять</button>
+                </form>
+                <button
+                    class="btn btn-danger reject-response-btn animated-btn"
+                    data-response-id="{{ response.id }}"
+                    data-csrf-token="{{ csrf_token }}">
+                    ❌ Отклонить
+                </button>
+            {% else %}
+                <!-- Если отклик принят -->
+                <p class="text-success fw-bold">Статус: принято</p>
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}
+
+            </div>
+        {% else %}
+            <p class="text-center text-muted"> У вас пока нет откликов.</p>
+        {% endif %}
+
+        <!-- Кнопка возврата -->
+        <div class="text-center mt-4">
+            <a href="{% url 'profile' %}" class="btn btn-light text-primary animated-btn">← Вернуться в личный кабинет</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const rejectButtons = document.querySelectorAll('.reject-response-btn');
+
+        rejectButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const responseId = this.dataset.responseId;
+                const csrfToken = this.dataset.csrfToken;
+                const responseCard = this.closest('.response-card');
+
+                fetch(`/responses/reject/${responseId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                    },
+                }).then(response => {
+                    if (response.ok) {
+                        responseCard.remove(); // Удаляем карточку из DOM
+                    } else {
+                        alert('Произошла ошибка при отклонении отклика.');
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+<style>
+    /* Центрируем контейнер */
+    .container {
+        max-width: 700px;
+    }
+
+    /* Карточки откликов */
+    .response-card {
+        border-radius: 12px;
+        background: #ffffff;
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .response-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Анимация кнопок */
+    .animated-btn {
+        transition: transform 0.2s ease-in-out, background-color 0.3s ease-in-out;
+    }
+    .animated-btn:hover {
+        transform: scale(1.05);
+    }
+    .animated-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Цветовые эффекты */
+    .btn-success:hover {
+        background-color: #218838;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const acceptButtons = document.querySelectorAll('.accept-response-btn');
+
+        acceptButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const responseId = this.dataset.responseId;
+                const csrfToken = document.querySelector(`[data-response-id="${responseId}"]`).dataset.csrfToken;
+
+                fetch(`/responses/accept/${responseId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                }).then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                }).then(data => {
+                    if (data.status === 'accepted') {
+                        const buttonsContainer = document.getElementById(`buttons-${responseId}`);
+                        buttonsContainer.innerHTML = '<p class="text-success"><strong>Статус:</strong> Принято</p>';
+                    }
+                }).catch(error => {
+                    console.error('Ошибка:', error);
+                });
+            });
+        });
+    });
+</script>
+
+
+{% endblock %}

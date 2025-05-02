@@ -1,0 +1,88 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="col-md-6 mx-auto">
+        <form method="post" enctype="multipart/form-data" class="mb-4">
+            {% csrf_token %}
+
+            <!-- Отображение аватарки -->
+            <div class="text-center mb-3">
+                <img src="{{ profile.avatar.url }}" alt="Аватар" class="rounded-circle profile-avatar">
+            </div>
+
+            <div class="mb-3">
+                <label for="avatar" class="form-label">Загрузить новый аватар:</label>
+                <input type="file" id="avatar" name="avatar" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="email" id="email" value="{{ profile.user.email }}" class="form-control" disabled>
+            </div>
+           <div class="mb-3">
+                <label for="id_nickname">Никнейм:</label>
+               <input type="text" id="id_nickname" value="{{ profile.nickname }}" class="form-control" disabled>
+            </div>
+
+            <div class="mb-3">
+                <label for="bio" class="form-label">Биография:</label>
+                <textarea id="bio" name="bio" class="form-control">{{ profile.bio }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 animated-btn">✅ Сохранить изменения</button>
+        </form>
+
+        <div class="d-flex justify-content-between">
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary animated-btn">🚪 Выйти</button>
+            </form>
+
+            <form action="{% url 'delete_account' %}" method="get">
+                <button type="submit" class="btn btn-primary animated-btn">🗑 Удалить аккаунт</button>
+            </form>
+        </div>
+        <!-- Кнопка для просмотра откликов -->
+        <div class="text-center mt-4">
+            <a href="{% url 'view_responses' %}" class="btn btn-info w-100 animated-btn">📬 Посмотреть отклики</a>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'ads_list' %}" class="btn btn-light text-primary animated-btn">← Вернуться к объявлениям</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Аватар */
+    .profile-avatar {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 2px solid #ddd;
+        padding: 3px;
+    }
+
+    /* Анимация кнопок */
+    .animated-btn {
+        transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    }
+    .animated-btn:hover {
+        transform: scale(1.05);
+    }
+
+    /* Специальные эффекты для кнопок */
+    .btn-success:hover {
+        background-color: #218838;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+{% endblock %}

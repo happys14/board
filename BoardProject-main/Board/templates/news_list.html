@@ -1,0 +1,104 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}Новости{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">📰 Новости</h1>
+
+    {% if pinned_news %}
+        <!-- Закреплённая новость -->
+        <div class="news-card card mb-4 shadow-sm border-primary">
+            <div class="row g-0">
+                <div class="col-md">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'news_detail' news_id=pinned_news.id %}" class="news-link text-primary">
+                                📌 {{ pinned_news.title }}
+                            </a>
+                        </h5>
+                        <p class="text-muted">{{ pinned_news.date|date:"d.m.Y H:i" }}</p>
+                        <p class="card-text">{{ pinned_news.content|striptags|truncatewords:30 }}</p>
+                        <a href="{% url 'news_detail' news_id=pinned_news.id %}" class="btn btn-primary btn-sm animated-btn">
+                            Читать дальше →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% for item in page_obj %}
+        {% if item.id != pinned_news.id %}  {# Исключаем закреплённую новость #}
+            <div class="news-card card mb-4 shadow-sm">
+                <div class="row g-0">
+                    <div class="col-md">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'news_detail' news_id=item.id %}" class="news-link">
+                                    {{ item.title }}
+                                </a>
+                            </h5>
+                            <p class="text-muted">{{ item.date|date:"d.m.Y H:i" }}</p>
+                            <p class="card-text">{{ item.content|striptags|truncatewords:30 }}</p>
+                            <a href="{% url 'news_detail' news_id=item.id %}" class="btn btn-primary btn-sm animated-btn">
+                                Читать дальше →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% empty %}
+        <p class="text-center">📭 Пока нет новостей.</p>
+    {% endfor %}
+
+    <!-- Пагинация -->
+    <nav aria-label="Навигация по страницам">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link animated-btn" href="?page=1">« Первая</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link animated-btn" href="?page={{ page_obj.previous_page_number }}">← Назад</a>
+                </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <span class="page-link">Стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link animated-btn" href="?page={{ page_obj.next_page_number }}">Вперёд →</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link animated-btn" href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'ads_list' %}" class="btn btn-light text-primary animated-btn">← Вернуться к объявлениям</a>
+    </div>
+</div>
+
+<!-- Стили с анимацией кнопок -->
+<style>
+
+
+    /* Анимация кнопок */
+    .animated-btn {
+        transition: transform 0.2s ease-in-out, background-color 0.3s ease-in-out;
+    }
+    .animated-btn:hover {
+        transform: scale(1.05);
+    }
+    .animated-btn:active {
+        transform: scale(0.95);
+    }
+</style>
+
+{% endblock %}

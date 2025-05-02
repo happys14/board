@@ -1,0 +1,77 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}Отклик на объявление{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="col-md-8 mx-auto">
+        <h2 class="text-center mb-4">📩 Отклик на объявление</h2>
+
+        <div class="ad-card shadow-sm p-4 mb-4">
+            <h4 class="text-center">{{ ad.title }}</h4>
+        </div>
+
+        <form method="post" class="response-form p-4 shadow-sm">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button type="submit" class="btn btn-success w-100 animated-btn">🚀 Отправить отклик</button>
+        </form>
+
+        <!-- Кнопка возврата -->
+        <div class="text-center mt-4">
+            <a href="{% url 'ads_list' %}" class="btn btn-light text-primary animated-btn">← Вернуться к объявлениям</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Центрирование контейнера */
+    .container {
+        max-width: 800px;
+    }
+
+    /* Карточка объявления */
+    .ad-card {
+        background: #ffffff;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    /* Стили формы */
+    .response-form {
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+
+    /* Поля формы */
+    .response-form input,
+    .response-form textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    /* Анимация кнопки */
+    .animated-btn {
+        transition: transform 0.2s ease-in-out, background-color 0.3s ease-in-out;
+    }
+    .animated-btn:hover {
+        transform: scale(1.05);
+    }
+    .animated-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Цветовые эффекты */
+    .btn-success:hover {
+        background-color: #218838;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+{% endblock %}

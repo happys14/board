@@ -1,0 +1,30 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}Подтверждение email{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-success text-center">
+                <div class="card-body">
+                    <h2 class="text-success">📩 Письмо отправлено!</h2>
+                    <p class="text-muted">
+                        Мы отправили вам код подтверждения на {{ email }}. <br>
+                        Пожалуйста, введите его ниже, чтобы завершить регистрацию.
+                    </p>
+                    {% if error %}
+                        <p class="text-danger">{{ error }}</p>
+                    {% endif %}
+                    <form method="post" action="{% url 'confirm_email' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="email" value="{{ email }}">
+                        <input type="text" name="code" class="form-control mb-3" placeholder="Введите код" required>
+                        <button type="submit" class="btn btn-success ">Подтвердить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

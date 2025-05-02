@@ -1,0 +1,94 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}Объявление{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="col-md-8 mx-auto">
+        <!-- Заголовок -->
+        <h1 class="text-center">{{ ad.title }}</h1>
+
+        <!-- Автор и дата -->
+        <p class="text-muted text-center">
+            <strong>Автор:</strong>
+            <a href="{% url 'user_profile' ad.author.id %}" class="text-decoration-none">
+                <img src="{{ ad.author.profile.avatar.url }}" alt="Аватар" class="rounded-circle me-2"
+                     style="width: 30px; height: 30px; object-fit: cover;">
+                {{ ad.author.profile.nickname }}
+            </a> |
+            <strong>Дата публикации:</strong> {{ ad.date|date:"d.m.Y H:i" }} |
+            <strong>Категории:</strong>
+            {% for category in ad.category.all %}
+                {{ category.category }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+
+        <!-- Медиа-контент (Изображение + Видео на одном уровне) -->
+        {% if ad.video %}
+            <div class="d-flex justify-content-center align-items-center gap-3 my-4 flex-wrap">
+
+                {% if ad.video %}
+                    <video class="ad-media rounded shadow-sm" controls>
+                        <source src="{{ ad.video.url }}" type="video/mp4">
+                        Ваш браузер не поддерживает видео.
+                    </video>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- Описание объявления -->
+        <div class="ad-content card p-4 shadow-sm">
+            <p class="lead">{{ ad.content|safe }}</p>
+        </div>
+
+        <!-- Кнопки действий -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'ads_list' %}" class="btn btn-light text-primary animated-btn">← Вернуться к объявлениям</a>
+
+             {% if can_edit %}
+                <div>
+                    <a href="{% url 'ads_edit' ad.id %}" class="btn btn-primary me-2 animated-btn">✏️ Редактировать</a>
+                    <a href="{% url 'ads_delete' ad.id %}" class="btn btn-outline-danger animated-btn">🗑 Удалить</a>
+                </div>
+            {% else %}
+                <!-- Кнопка отклика -->
+                <a href="{% url 'create_response' ad.id %}" class="btn btn-success animated-btn">✉️ Откликнуться</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<style>
+    /* Центрирование блока figure */
+.ad-content figure {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto; /* Центрирование */
+}
+.ad-content figure img {
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 400px !important;
+    object-fit: contain;
+}
+    /* Ограничение максимального размера для видео */
+    .ad-media {
+        max-width: 400px; /* Общий размер для картинки и видео */
+        max-height: 400px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+    .animated-btn {
+        transition: transform 0.2s ease-in-out, background-color 0.3s ease-in-out;
+    }
+    .animated-btn:hover {
+        transform: scale(1.05);
+    }
+    .animated-btn:active {
+        transform: scale(0.95);
+    }
+</style>
+
+{% endblock %}

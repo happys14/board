@@ -1,0 +1,55 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}Удаление аккаунта{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-body text-center">
+                    <h2 class="text-danger">⚠️ Удаление аккаунта</h2>
+                    <p class="text-muted">
+                        Вы уверены, что хотите удалить свой аккаунт? <br>
+                        <strong>Это действие невозможно отменить!</strong>
+                    </p>
+
+                    <form method="post" class="mt-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg">❌ Удалить аккаунт</button>
+                        <a href="{% url 'profile' %}" class="btn btn-secondary btn-lg ms-2">↩️ Отмена</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Убираем верхний отступ у контейнера */
+    .container {
+        max-width: 600px;
+    }
+
+    /* Тень и закругление у карточки */
+    .card {
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    /* Стили для кнопки удаления */
+    .btn-danger {
+        transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+        transform: scale(1.05);
+    }
+
+    /* Стили для кнопки отмены */
+    .btn-secondary:hover {
+        transform: scale(1.05);
+    }
+</style>
+
+{% endblock %}
